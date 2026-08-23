@@ -64,6 +64,8 @@ export default function Home() {
   const introCS = ['CS 111X', 'CS 211X', 'CS 2800']
   const statsProb = ['CS 2800', 'STSCI 3080', 'ECON 3130', 'ENGRD 2700', 'MATH 4710']
   const multivarCalc = calculus.slice(3) // MATH 1920, MATH 2220, MATH 2240
+  const aiml = ['CS 3700', 'CS 3780', 'CS 4670', 'CS 4740', 'ECE 4200', 'ORIE 3741', 'STSCI 3740'] // AI / Machine Learning Courses
+  const introPhysics = ['PHYS 1101', 'PHYS 1112', 'PHYS 2207']
 
   // Function to add or remove a course from the completed courses list based on the category
   const addRemoveCourse = (course, category) => {
@@ -284,25 +286,114 @@ export default function Home() {
           <h3>{practicumCompleted.length >= 1 ? 'All requirements met' : 'Additional courses required'}</h3>
           <p style={{ color: '#ffffff' }}>Students must complete one of the following:</p>
           <ul>
-            <li>CS 3152</li>
-            <li>CS 4121</li>
-            <li>CS 4152</li>
-            <li>CS 4321</li>
-            <li>CS 4411</li>
-            <li>CS 4621</li>
-            <li>CS 4701</li>
-            <li>CS 4740</li>
-            <li>CS 5121</li>
-            <li>CS 5150</li>
-            <li>CS 5152</li>
-            <li>CS 5321</li>
-            <li>CS 5411</li>
-            <li>CS 5412</li>
-            <li>CS 5414</li>
-            <li>CS 5621</li>
-            <li>CS 5625</li>
-            <li>CS 5643</li>
-            <li>CS 5740</li>
+            <li>CS 3152 <button onClick={() => addRemoveCourse('CS 3152', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 211X'))}>
+                Add/Remove Course
+              </button>
+              <p>NOTE: CS 3152 must be taken alongside ENGRC 3152</p>
+            </li>
+            <li>CS 4121 <button onClick={() => addRemoveCourse('CS 4121', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 3110') && (allCompleted.includes('CS 3410') || allCompleted.includes('CS 3420')))}>
+                Add/Remove Course
+              </button>
+              <p>NOTE: CS 4121 must be taken alongside CS 4120 (Introduction to Compilers)</p>
+            </li>
+            <li>CS 4152 <button onClick={() => addRemoveCourse('CS 4152', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 3152') && (allCompleted.includes('CS 3300') || allCompleted.includes('CS 3700')
+                || allCompleted.includes('CS 4620') || allCompleted.includes('CS 5414')))}>
+                Add/Remove Course
+              </button>
+              <p>NOTE: CS 4152 must be taken alongside ENGRC 4152</p>
+            </li>
+            <li>CS 4321 <button onClick={() => addRemoveCourse('CS 4321', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 4320') || allCompleted.includes('CS 5320'))}>
+                Add/Remove Course
+              </button>
+              <p>NOTE: CS 4321 can also be taken alongside CS 4320 or CS 5320. 
+              If this is the case, then you must add one of the two to your Completed list.</p>
+            </li>
+            <li>CS 4411 <button onClick={() => addRemoveCourse('CS 4411', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 4410'))}>
+                Add/Remove Course
+              </button>
+              <p>NOTE: CS 4411 must be taken alongside CS 4410. 
+                Add CS 4410 to your Completed list if not done already.</p>
+            </li>
+            <li>CS 4621 <button onClick={() => addRemoveCourse('CS 4621', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 4620'))}>
+                Add/Remove Course
+              </button>
+              <p>NOTE: CS 4621 can also be taken concurrently with CS 4620. 
+              If this is the case, then you must add CS 4620 to your Completed list.</p>
+            </li>
+            <li>CS 4701 <button onClick={() => addRemoveCourse('CS 4701', 'practicum')} 
+              disabled={!(aiml.some(c => allCompleted.includes(c)))}>
+                Add/Remove Course
+              </button></li>
+            <li>CS 4740 <button onClick={() => addRemoveCourse('CS 4740', 'practicum')}>
+                Add/Remove Course
+              </button>
+              <p>NOTE: Although CS 4740 does not have official prerequisites, it is highly recommended that 
+              students take CS 2110, CS 3110, linear algebra, and calculus before taking this course.</p>
+            </li>
+            <li>CS 5121 <button onClick={() => addRemoveCourse('CS 5121', 'practicum')}>
+                Add/Remove Course
+              </button>
+              <p>NOTE: CS 5121 must be taken alongside CS 5120.</p>
+            </li>
+            <li>CS 5150 <button onClick={() => addRemoveCourse('CS 5150', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 211X'))}>
+                Add/Remove Course
+              </button></li>
+            <li>CS 5152 <button onClick={() => addRemoveCourse('CS 5152', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 3152') && (allCompleted.includes('CS 3300') || allCompleted.includes('CS 3700')
+                || allCompleted.includes('CS 4620') || allCompleted.includes('CS 5414')))}>
+                Add/Remove Course
+              </button>
+              <p>NOTE: CS 5152 must be taken alongside ENGRC 5152.</p>
+            </li>
+            <li>CS 5321 <button onClick={() => addRemoveCourse('CS 5321', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 5320'))}>
+                Add/Remove Course
+              </button>
+              <p>CS 5321 can also be taken concurrently with CS 5320. 
+              If this is the case, then you must add CS 5320 to your Completed list.</p>
+            </li>
+            <li>CS 5411 <button onClick={() => addRemoveCourse('CS 5411', 'practicum')}>
+                Add/Remove Course
+              </button>
+              <p>NOTE: CS 5411 must be taken alongside CS 5410.</p>
+            </li>
+            <li>CS 5412 <button onClick={() => addRemoveCourse('CS 5412', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 4410'))}>
+                Add/Remove Course
+              </button></li>
+            <li>CS 5414 <button onClick={() => addRemoveCourse('CS 5414', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 4410'))}>
+                Add/Remove Course
+              </button></li>
+            <li>CS 5621 <button onClick={() => addRemoveCourse('CS 5621', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 5620'))}>
+                Add/Remove Course
+              </button>
+              <p>NOTE: CS 5621 can also be taken concurrently with CS 5620. 
+              If so, then you must add CS 5620 to your Completed list.</p>
+            </li>
+            <li>CS 5625 <button onClick={() => addRemoveCourse('CS 5625', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 4620') || allCompleted.includes('CS 5620'))}>
+                Add/Remove Course
+              </button></li>
+            <li>CS 5643 <button onClick={() => addRemoveCourse('CS 5643', 'practicum')} 
+              disabled={!(allCompleted.includes('CS 4620') && calculus.some(c => allCompleted.includes(c)) 
+                         && linalg.some(c => allCompleted.includes(c)) && introPhysics.some(c => allCompleted.includes(c)))}>
+                Add/Remove Course
+              </button></li>
+            <li>CS 5740 <button onClick={() => addRemoveCourse('CS 5740', 'practicum')}>
+                Add/Remove Course
+              </button>
+              <p>NOTE: Although CS 5740 does not have official prerequisites, it is highly recommended that 
+              students take CS 2110, CS 3110, linear algebra, and calculus before taking this course.</p>
+            </li>
           </ul>
           <Link to="/csPracticumProject">
             <button>See Course Descriptions</button>
