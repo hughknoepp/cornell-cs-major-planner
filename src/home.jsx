@@ -14,6 +14,9 @@ export default function Home() {
   const [coreCompleted, setCoreCompleted] = useState([])
   const [electivesCompleted, setElectivesCompleted] = useState([])
   const [practicumCompleted, setPracticumCompleted] = useState([])
+  const [technicalElectivesCompleted, setTechnicalElectivesCompleted] = useState([])
+  const [externalSpecCompleted, setExternalSpecCompleted] = useState([])
+  const [threeCreditElective, setThreeCreditElective] = useState(false)
   const [allCompleted, setAllCompleted] = useState([])
 
   // Tracks whether saved progress has finished loading, so the save effect
@@ -29,6 +32,9 @@ export default function Home() {
         setCoreCompleted(data.coreCompleted || [])
         setElectivesCompleted(data.electivesCompleted || [])
         setPracticumCompleted(data.practicumCompleted || [])
+        setTechnicalElectivesCompleted(data.technicalElectivesCompleted || [])
+        setExternalSpecCompleted(data.externalSpecCompleted || [])
+        setThreeCreditElective(data.threeCreditElective || false)
         setAllCompleted(data.allCompleted || [])
       })
       .finally(() => {
@@ -114,6 +120,27 @@ export default function Home() {
           setPracticumCompleted([...practicumCompleted, course])
           setAllCompleted([...allCompleted, course])
         }
+        break
+      case 'technicalElectives':
+        if (technicalElectivesCompleted.includes(course)) {
+          setTechnicalElectivesCompleted(technicalElectivesCompleted.filter(c => c !== course))
+          setAllCompleted(allCompleted.filter(c => c !== course))
+        } else {
+          setTechnicalElectivesCompleted([...technicalElectivesCompleted, course])
+          setAllCompleted([...allCompleted, course])
+        }
+        break
+      case 'externalSpec':
+        if (externalSpecCompleted.includes(course)) {
+          setExternalSpecCompleted(externalSpecCompleted.filter(c => c !== course))
+          setAllCompleted(allCompleted.filter(c => c !== course))
+        } else {
+          setExternalSpecCompleted([...externalSpecCompleted, course])
+          setAllCompleted([...allCompleted, course])
+        }
+        break
+      case 'threeCreditElective':
+        setThreeCreditElective(!threeCreditElective)
         break
       default:
         if (allCompleted.includes(course)) {
@@ -398,6 +425,22 @@ export default function Home() {
           <Link to="/csPracticumProject">
             <button>See Course Descriptions</button>
           </Link>
+        </div>
+        <div id="technical-electives">
+          <h2>Technical Electives</h2>
+          <ul>
+            {technicalElectivesCompleted.map(course => (
+              <li key={course}>{course}</li>
+            ))}
+          </ul>
+        </div>
+        <div id="external-spec">
+          <h2>External Specializations</h2>
+          <ul>
+            {externalSpecCompleted.map(course => (
+              <li key={course}>{course}</li>
+            ))}
+          </ul>
         </div>
       </section>
 
