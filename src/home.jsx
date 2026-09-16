@@ -18,6 +18,7 @@ export default function Home() {
   const [externalSpecCompleted, setExternalSpecCompleted] = useState([])
   const [externalSpecInput, setExternalSpecInput] = useState('')
   const [electiveReqCredits, setElectiveReqCredits] = useState(0)
+  const [electiveReqCourse, setElectiveReqCourse] = useState('')
   const [threeCreditCourseInput, setThreeCreditCourseInput] = useState('')
   const [threeCreditCreditsInput, setThreeCreditCreditsInput] = useState('')
   const [allCompleted, setAllCompleted] = useState([])
@@ -38,6 +39,7 @@ export default function Home() {
         setTechnicalElectivesCompleted(data.technicalElectivesCompleted || [])
         setExternalSpecCompleted(data.externalSpecCompleted || [])
         setElectiveReqCredits(data.electiveReqCredits || 0)
+        setElectiveReqCourse(data.electiveReqCourse || '')
         setAllCompleted(data.allCompleted || [])
       })
       .finally(() => {
@@ -61,6 +63,7 @@ export default function Home() {
             technicalElectivesCompleted,
             externalSpecCompleted,
             electiveReqCredits,
+            electiveReqCourse,
             allCompleted,
           },
         }),
@@ -68,7 +71,7 @@ export default function Home() {
     }, 500)
 
     return () => clearTimeout(timeoutId)
-  }, [introCSCompleted, mathCompleted, coreCompleted, electivesCompleted, practicumCompleted, technicalElectivesCompleted, externalSpecCompleted, electiveReqCredits, allCompleted])
+  }, [introCSCompleted, mathCompleted, coreCompleted, electivesCompleted, practicumCompleted, technicalElectivesCompleted, externalSpecCompleted, electiveReqCredits, electiveReqCourse, allCompleted])
 
   // Arrays of courses for each category (i.e. Intro Computing, Linear Algebra, Calculus)
   const linAlg = ['MATH 2210', 'MATH 2310', 'MATH 2940', 'MATH 2230']
@@ -215,14 +218,30 @@ export default function Home() {
     )
 
     if (confirmed) {
-      setElectiveReqCredits(credits)
-      if (!allCompleted.includes(course)) {
-        setAllCompleted([...allCompleted, course])
+      // Replace whichever course previously fulfilled this requirement, if any.
+      let updatedAllCompleted = electiveReqCourse && electiveReqCourse !== course
+        ? allCompleted.filter(c => c !== electiveReqCourse)
+        : allCompleted
+      if (!updatedAllCompleted.includes(course)) {
+        updatedAllCompleted = [...updatedAllCompleted, course]
       }
+
+      setElectiveReqCourse(course)
+      setElectiveReqCredits(credits)
+      setAllCompleted(updatedAllCompleted)
     }
 
     setThreeCreditCourseInput('')
     setThreeCreditCreditsInput('')
+  }
+
+  // Removes the course currently fulfilling the three-credit elective requirement
+  const handleThreeCreditRemove = () => {
+    if (electiveReqCourse) {
+      setAllCompleted(allCompleted.filter(c => c !== electiveReqCourse))
+    }
+    setElectiveReqCourse('')
+    setElectiveReqCredits(0)
   }
 
   return (
@@ -516,6 +535,11 @@ export default function Home() {
           <p style={{ color: '#ffffff' }}>Students must complete three external specialization courses from any department other than CS.
             <br />If a course is cross-listed with CS (only one allowed), then the non-CS listing must be used to fulfill this requirement.
           </p>
+          <ul>
+            {externalSpecCompleted.map(course => (
+              <li key={course}>{course} <button onClick={() => addRemoveCourse(course, 'externalSpec')}>Remove Course</button></li>
+            ))}
+          </ul>
           <form onSubmit={handleExternalSpecSubmit}>
             <input
               type="text"
@@ -532,6 +556,9 @@ export default function Home() {
           <p style={{ color: '#ffffff' }}>Students must complete one three-credit elective from any department.
             <br />Please check <a href="https://classes.cornell.edu/">the Class Roster</a> to confirm the course code and number of credits are correct before adding it below.
           </p>
+          {electiveReqCourse && (
+            <p>{electiveReqCourse} ({electiveReqCredits} credit{electiveReqCredits === 1 ? '' : 's'}) <button onClick={handleThreeCreditRemove}>Remove Course</button></p>
+          )}
           <form onSubmit={handleThreeCreditSubmit}>
             <input
               type="text"
