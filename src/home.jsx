@@ -16,6 +16,7 @@ export default function Home() {
   const [practicumCompleted, setPracticumCompleted] = useState([])
   const [technicalElectivesCompleted, setTechnicalElectivesCompleted] = useState([])
   const [externalSpecCompleted, setExternalSpecCompleted] = useState([])
+  const [externalSpecInput, setExternalSpecInput] = useState('')
   const [threeCreditElective, setThreeCreditElective] = useState(false)
   const [allCompleted, setAllCompleted] = useState([])
 
@@ -55,6 +56,9 @@ export default function Home() {
             coreCompleted,
             electivesCompleted,
             practicumCompleted,
+            technicalElectivesCompleted,
+            externalSpecCompleted,
+            threeCreditElective,
             allCompleted,
           },
         }),
@@ -62,7 +66,7 @@ export default function Home() {
     }, 500)
 
     return () => clearTimeout(timeoutId)
-  }, [introCSCompleted, mathCompleted, coreCompleted, electivesCompleted, practicumCompleted, allCompleted])
+  }, [introCSCompleted, mathCompleted, coreCompleted, electivesCompleted, practicumCompleted, technicalElectivesCompleted, externalSpecCompleted, threeCreditElective, allCompleted])
 
   // Arrays of courses for each category (i.e. Intro Computing, Linear Algebra, Calculus)
   const linAlg = ['MATH 2210', 'MATH 2310', 'MATH 2940', 'MATH 2230']
@@ -126,7 +130,9 @@ export default function Home() {
           setTechnicalElectivesCompleted(technicalElectivesCompleted.filter(c => c !== course))
           setAllCompleted(allCompleted.filter(c => c !== course))
         } else {
-          setTechnicalElectivesCompleted([...technicalElectivesCompleted, course])
+          if (!electivesCompleted.includes(course)) {
+            setTechnicalElectivesCompleted([...technicalElectivesCompleted, course])
+          }
           setAllCompleted([...allCompleted, course])
         }
         break
@@ -135,7 +141,9 @@ export default function Home() {
           setExternalSpecCompleted(externalSpecCompleted.filter(c => c !== course))
           setAllCompleted(allCompleted.filter(c => c !== course))
         } else {
-          setExternalSpecCompleted([...externalSpecCompleted, course])
+          if (!technicalElectivesCompleted.includes(course)) {
+            setExternalSpecCompleted([...externalSpecCompleted, course])
+          }
           setAllCompleted([...allCompleted, course])
         }
         break
@@ -150,6 +158,45 @@ export default function Home() {
         }
         break
     }
+  }
+
+  // Handles submission of the manual external specialization course entry form
+  const handleExternalSpecSubmit = (e) => {
+    e.preventDefault()
+    const course = externalSpecInput.trim().toUpperCase()
+    const prefix = course.split(' ')[0]
+
+    if (!course || externalSpecCompleted.includes(course)) {
+      setExternalSpecInput('')
+      return
+    }
+
+    if (prefix === 'CS') {
+      alert('External specialization courses cannot be CS courses.')
+      setExternalSpecInput('')
+      return
+    }
+
+    // External specialization courses must either all share the same department
+    // prefix, or (if departments differ) have advisor-approved the sequence.
+    const existingPrefixes = [...new Set(externalSpecCompleted.map(c => c.split(' ')[0]))]
+    const sameDepartment = existingPrefixes.length === 0
+      || (existingPrefixes.length === 1 && existingPrefixes[0] === prefix)
+
+    if (!sameDepartment) {
+      const approved = window.confirm(
+        `${course} has a different department prefix than your other external specialization course(s) (${existingPrefixes.join(', ')}). ` +
+        'Has a CS Academic Advisor approved this sequence of differing-department courses?'
+      )
+      if (!approved) {
+        setExternalSpecInput('')
+        return
+      }
+    }
+
+    setExternalSpecCompleted([...externalSpecCompleted, course])
+    setAllCompleted([...allCompleted, course])
+    setExternalSpecInput('')
   }
 
   return (
@@ -428,19 +475,38 @@ export default function Home() {
         </div>
         <div id="technical-electives">
           <h2>Technical Electives</h2>
-          <ul>
-            {technicalElectivesCompleted.map(course => (
-              <li key={course}>{course}</li>
-            ))}
-          </ul>
+          <h3>Completed: {technicalElectivesCompleted.join(', ')}</h3>
+          <h3>{technicalElectivesCompleted.length === 3 ? 'All Technical Electives Completed!' : 'Additional courses required'}</h3>
+          <p style={{ color: '#ffffff' }}>Students must complete three technical elective courses from any department.
+            <br />Please refer to <a href="https://catalog.cornell.edu/programs/computer-science-ba/#curriculumtext">the curriculum guide </a>
+            for more information.</p>
         </div>
+      </section>
+      <section id="next-steps-4">
         <div id="external-spec">
-          <h2>External Specializations</h2>
-          <ul>
-            {externalSpecCompleted.map(course => (
-              <li key={course}>{course}</li>
-            ))}
-          </ul>
+          <h2>External Specialization</h2>
+          <h3>Completed: {externalSpecCompleted.join(', ')}</h3>
+          <h3>{externalSpecCompleted.length === 3 ? 'All External Specializations Completed!' : 'Additional courses required'}</h3>
+          <p style={{ color: '#ffffff' }}>Students must complete three external specialization courses from any department other than CS.
+            <br />If a course is cross-listed with CS, then the non-CS listing must be used to fulfill this requirement.
+          </p>
+          <form onSubmit={handleExternalSpecSubmit}>
+            <input
+              type="text"
+              value={externalSpecInput}
+              onChange={(e) => setExternalSpecInput(e.target.value)}
+              placeholder="Enter course code (e.g. GOVT 1111)"
+            />
+            <button type="submit">Add Course</button>
+          </form>
+        </div>
+        <div id="three-credit-elective">
+          <h2>Three-Credit Elective</h2>
+          <h3>Completed: {threeCreditElective ? 'Yes' : 'No'}</h3>
+          <p style={{ color: '#ffffff' }}>Students must complete one three-credit elective from any department.</p>
+          <button onClick={() => addRemoveCourse('threeCreditElective', 'threeCreditElective')}>
+            {threeCreditElective ? 'Remove Course' : 'Add Course'}
+          </button>
         </div>
       </section>
 
