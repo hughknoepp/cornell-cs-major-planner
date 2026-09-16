@@ -17,7 +17,9 @@ export default function Home() {
   const [technicalElectivesCompleted, setTechnicalElectivesCompleted] = useState([])
   const [externalSpecCompleted, setExternalSpecCompleted] = useState([])
   const [externalSpecInput, setExternalSpecInput] = useState('')
-  const [threeCreditElective, setThreeCreditElective] = useState(false)
+  const [electiveReqCredits, setElectiveReqCredits] = useState(0)
+  const [threeCreditCourseInput, setThreeCreditCourseInput] = useState('')
+  const [threeCreditCreditsInput, setThreeCreditCreditsInput] = useState('')
   const [allCompleted, setAllCompleted] = useState([])
 
   // Tracks whether saved progress has finished loading, so the save effect
@@ -35,7 +37,7 @@ export default function Home() {
         setPracticumCompleted(data.practicumCompleted || [])
         setTechnicalElectivesCompleted(data.technicalElectivesCompleted || [])
         setExternalSpecCompleted(data.externalSpecCompleted || [])
-        setThreeCreditElective(data.threeCreditElective || false)
+        setElectiveReqCredits(data.electiveReqCredits || 0)
         setAllCompleted(data.allCompleted || [])
       })
       .finally(() => {
@@ -58,7 +60,7 @@ export default function Home() {
             practicumCompleted,
             technicalElectivesCompleted,
             externalSpecCompleted,
-            threeCreditElective,
+            electiveReqCredits,
             allCompleted,
           },
         }),
@@ -66,7 +68,7 @@ export default function Home() {
     }, 500)
 
     return () => clearTimeout(timeoutId)
-  }, [introCSCompleted, mathCompleted, coreCompleted, electivesCompleted, practicumCompleted, technicalElectivesCompleted, externalSpecCompleted, threeCreditElective, allCompleted])
+  }, [introCSCompleted, mathCompleted, coreCompleted, electivesCompleted, practicumCompleted, technicalElectivesCompleted, externalSpecCompleted, electiveReqCredits, allCompleted])
 
   // Arrays of courses for each category (i.e. Intro Computing, Linear Algebra, Calculus)
   const linAlg = ['MATH 2210', 'MATH 2310', 'MATH 2940', 'MATH 2230']
@@ -147,9 +149,6 @@ export default function Home() {
           setAllCompleted([...allCompleted, course])
         }
         break
-      case 'threeCreditElective':
-        setThreeCreditElective(!threeCreditElective)
-        break
       default:
         if (allCompleted.includes(course)) {
           setAllCompleted(allCompleted.filter(c => c !== course))
@@ -197,6 +196,33 @@ export default function Home() {
     setExternalSpecCompleted([...externalSpecCompleted, course])
     setAllCompleted([...allCompleted, course])
     setExternalSpecInput('')
+  }
+
+  // Handles submission of the manual three-credit elective entry form
+  const handleThreeCreditSubmit = (e) => {
+    e.preventDefault()
+    const course = threeCreditCourseInput.trim().toUpperCase()
+    const credits = Number(threeCreditCreditsInput)
+
+    if (!course || !Number.isFinite(credits) || credits <= 0) {
+      setThreeCreditCourseInput('')
+      setThreeCreditCreditsInput('')
+      return
+    }
+
+    const confirmed = window.confirm(
+      `Please check the Class Roster to confirm ${course} is correct and worth ${credits} credit(s) before adding it as your three-credit elective.`
+    )
+
+    if (confirmed) {
+      setElectiveReqCredits(credits)
+      if (!allCompleted.includes(course)) {
+        setAllCompleted([...allCompleted, course])
+      }
+    }
+
+    setThreeCreditCourseInput('')
+    setThreeCreditCreditsInput('')
   }
 
   return (
@@ -488,25 +514,40 @@ export default function Home() {
           <h3>Completed: {externalSpecCompleted.join(', ')}</h3>
           <h3>{externalSpecCompleted.length === 3 ? 'All External Specializations Completed!' : 'Additional courses required'}</h3>
           <p style={{ color: '#ffffff' }}>Students must complete three external specialization courses from any department other than CS.
-            <br />If a course is cross-listed with CS, then the non-CS listing must be used to fulfill this requirement.
+            <br />If a course is cross-listed with CS (only one allowed), then the non-CS listing must be used to fulfill this requirement.
           </p>
           <form onSubmit={handleExternalSpecSubmit}>
             <input
               type="text"
               value={externalSpecInput}
               onChange={(e) => setExternalSpecInput(e.target.value)}
-              placeholder="Enter course code (e.g. GOVT 1111)"
+              placeholder="Enter course code (e.g. CHEM 3570)"
             />
             <button type="submit">Add Course</button>
           </form>
         </div>
         <div id="three-credit-elective">
           <h2>Three-Credit Elective</h2>
-          <h3>Completed: {threeCreditElective ? 'Yes' : 'No'}</h3>
-          <p style={{ color: '#ffffff' }}>Students must complete one three-credit elective from any department.</p>
-          <button onClick={() => addRemoveCourse('threeCreditElective', 'threeCreditElective')}>
-            {threeCreditElective ? 'Remove Course' : 'Add Course'}
-          </button>
+          <h3>Completed: {electiveReqCredits >= 3 ? 'Yes' : 'No'}</h3>
+          <p style={{ color: '#ffffff' }}>Students must complete one three-credit elective from any department.
+            <br />Please check <a href="https://classes.cornell.edu/">the Class Roster</a> to confirm the course code and number of credits are correct before adding it below.
+          </p>
+          <form onSubmit={handleThreeCreditSubmit}>
+            <input
+              type="text"
+              value={threeCreditCourseInput}
+              onChange={(e) => setThreeCreditCourseInput(e.target.value)}
+              placeholder="Course code (e.g. CS 2110)"
+            />
+            <input
+              type="number"
+              min="1"
+              value={threeCreditCreditsInput}
+              onChange={(e) => setThreeCreditCreditsInput(e.target.value)}
+              placeholder="# Credits"
+            />
+            <button type="submit">Add Course</button>
+          </form>
         </div>
       </section>
 
