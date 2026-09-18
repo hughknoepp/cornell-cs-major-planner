@@ -534,6 +534,7 @@ export default function Home() {
           <h3>{externalSpecCompleted.length === 3 ? 'All External Specializations Completed!' : 'Additional courses required'}</h3>
           <p style={{ color: '#ffffff' }}>Students must complete three external specialization courses from any department other than CS.
             <br />If a course is cross-listed with CS (only one allowed), then the non-CS listing must be used to fulfill this requirement.
+            <br />The three courses must either all share the same department prefix, or (if departments differ) have advisor-approved the sequence.
           </p>
           <ul>
             {externalSpecCompleted.map(course => (
@@ -553,7 +554,7 @@ export default function Home() {
         <div id="three-credit-elective">
           <h2>Three-Credit Elective</h2>
           <h3>Completed: {electiveReqCredits >= 3 ? 'Yes' : 'No'}</h3>
-          <p style={{ color: '#ffffff' }}>Students must complete one three-credit elective from any department.
+          <p style={{ color: '#ffffff' }}>Students must complete one three-credit elective from any department, or a combination of courses that add up to three credits.
             <br />Please check <a href="https://classes.cornell.edu/">the Class Roster</a> to confirm the course code and number of credits are correct before adding it below.
           </p>
           {electiveReqCourse && (
